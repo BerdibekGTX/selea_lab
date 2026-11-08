@@ -1,0 +1,21 @@
+/* Free BoardUI layouts adapted to Selea's shared typography and theme. */
+.bui-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:24px}
+.bui-stat{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:14px;min-width:0;padding:20px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface)}
+.bui-stat-icon{display:grid;place-items:center;width:32px;height:32px;border-radius:var(--radius-sm);background:var(--accent-soft);color:var(--accent)}
+.bui-stat-label{font-size:12px;color:var(--muted)}
+.bui-stat-value{font-size:30px;font-weight:550;line-height:1.3;letter-spacing:-1px;font-variant-numeric:tabular-nums;margin-top:4px}
+.bui-stat-caption{font-size:11px;color:var(--subtle);margin-top:auto;line-height:1.5}
+.bui-pagination{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;margin-top:24px}
+.bui-pagination button{display:flex;align-items:center;justify-content:center;gap:8px;min-width:34px;height:34px;padding:0 10px;border:1px solid var(--line);border-radius:var(--radius-sm);font-size:12px;background:var(--surface);color:var(--muted)}
+.bui-pagination button:hover:not(:disabled){background:var(--surface-raised);color:var(--text)}
+.bui-pagination ul{display:flex;align-items:center;gap:4px;list-style:none;padding:0;margin:0}
+.bui-pagination li>span{display:grid;place-items:center;min-width:24px;color:var(--subtle)}
+.bui-pagination li button{border-color:transparent;background:transparent;padding:0}
+.bui-pagination button[aria-current=page]{background:var(--accent-soft);border-color:var(--line-hover);color:var(--accent)}
+.bui-thinking{display:flex;align-items:center;gap:10px;margin:20px 0;color:var(--accent);font-size:13px}
+.bui-thinking-grid{display:grid;grid-template-columns:repeat(3,4px);gap:2px;flex:none}
+.bui-thinking-grid>span{width:4px;height:4px;background:currentColor;border-radius:1px;transition:opacity 220ms ease}
+.bui-thinking-timer{color:var(--subtle);font-size:11px;font-variant-numeric:tabular-nums;min-width:28px}
+@media(max-width:1000px){.bui-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:480px){.bui-stat{padding:16px;gap:12px}.bui-stat-value{font-size:26px}.bui-pagination ul{gap:2px}}
+@media(prefers-reduced-motion:reduce){.bui-thinking-grid>span{transition:none}}

@@ -1,0 +1,32 @@
+node_modules/
+.next/
+.next-production/
+__pycache__/
+.pytest_cache/
+.venv/
+*.pyc
+*.db
+.env
+.env.local
+
+# Local credentials, databases, and generated files
+.env.*
+!.env.example
+!.env.*.example
+*.db-*
+*.sqlite
+*.sqlite3
+*.sqlite3-*
+*.log
+*.tsbuildinfo
+.next-*/
+coverage/
+.DS_Store
+Thumbs.db
+
+# Local screenshots, backups, and unrelated reference projects
+/artifacts/
+/design-reference/
+/portfolio/
+/ai-video-ads-responses.md
+

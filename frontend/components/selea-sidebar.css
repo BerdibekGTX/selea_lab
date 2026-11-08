@@ -1,0 +1,56 @@
+/* BoardUI's 260px floating panel and 60px rail, using Selea tokens. */
+:root{--beui-background:225 5% 8%;--beui-foreground:240 4% 95%;--beui-muted:218 11% 19%;--beui-muted-foreground:225 5% 69%;--beui-border:223 7% 20%;--beui-ring:240 3% 85%}
+.selea-shell{display:flex;min-height:100dvh;background:var(--bg)}
+.selea-shell>main{flex:1;min-width:0}
+.bui-desktop-sidebar{position:sticky;top:12px;height:calc(100dvh - 24px);margin:12px 0 12px 12px;flex:none;z-index:30}
+.bui-sidebar{font-family:var(--font-ui);color:var(--text)}
+.bui-sidebar a{text-decoration:none}
+.bui-sidebar button{font-family:inherit}
+.bui-sidebar a[aria-disabled=true]{opacity:.45;pointer-events:none}
+.bui-sidebar :is(a,button,summary):focus-visible{outline:2px solid var(--text);outline-offset:2px}
+.bui-workspace{display:flex;align-items:center;gap:9px;min-height:36px;white-space:nowrap;color:var(--text)}
+.bui-workspace-icon{width:36px;height:36px;display:grid;place-items:center;border-radius:50%;background:var(--surface-raised);flex:none}
+.bui-workspace-icon svg{width:19px;height:19px}
+.bui-workspace-name{font-family:Georgia,serif;font-size:24px;letter-spacing:-1px;line-height:1}
+.bui-resources{padding:12px 2px 16px;border-top:1px solid var(--line);margin-top:4px}
+.bui-label{display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:500;color:var(--subtle);padding:0 8px;margin:0 0 8px}
+.bui-label span{font-size:11px;color:var(--muted)}
+.bui-empty{color:var(--subtle);font-size:12px;line-height:1.6;margin:0;padding:2px 8px}
+.bui-chat{display:flex;align-items:center;gap:8px;padding:8px;border-radius:10px;min-height:36px;color:var(--muted);font-size:13px}
+.bui-chat svg{flex:none}.bui-chat span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bui-categories{margin-bottom:20px}
+.bui-categories a,.bui-categories summary{display:flex;align-items:center;justify-content:space-between;min-height:32px;padding:6px 8px;border-radius:8px;color:var(--muted);font-size:13px;cursor:pointer;list-style:none}
+.bui-categories summary::-webkit-details-marker{display:none}
+.bui-categories summary svg{transition:transform 180ms}.bui-categories details[open]>summary svg{transform:rotate(90deg)}
+.bui-categories details a{margin-left:12px;border-left:1px solid var(--line);border-radius:0;padding-left:12px}
+.bui-sidebar :is(.bui-chat,.bui-categories a,.bui-categories summary):hover{background:var(--surface-raised);color:var(--text)}
+.bui-sidebar :is(.bui-chat,.bui-categories a)[aria-current=page]{background:var(--accent-soft);color:var(--text)}
+.bui-account{display:flex;align-items:center;gap:8px;width:100%;padding:10px 8px;border-radius:14px;border:1px solid var(--line);background:var(--surface);text-align:left;min-height:56px;transition:background 180ms}
+.bui-account:hover{background:var(--surface-raised)}
+.bui-account-avatar{display:grid;place-items:center;flex:none;width:32px;height:32px;border-radius:50%;background:var(--accent-soft);color:var(--text);font-size:13px;font-weight:500}
+.bui-account-copy{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}
+.bui-account-copy strong{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)}
+.bui-account-copy small{font-size:11px;color:var(--subtle)}
+.bui-account>svg{flex:none;color:var(--subtle)}
+.bui-account.is-collapsed{width:36px;min-height:36px;justify-content:center;padding:0;border:0;background:none}
+.selea-shell .topbar{height:64px;padding-inline:24px;gap:12px}
+.selea-shell .workspace-sidebar-toggle{display:none}
+.selea-shell .header-brand,.selea-shell.expanded .header-brand{display:none}
+.selea-shell .header-divider{display:none}
+.selea-shell .header-location{font-size:13px;margin:0}
+.bui-drawer-overlay{position:fixed;inset:0;z-index:100;background:#0009;backdrop-filter:blur(3px);display:flex;padding:8px;animation:bui-overlay-in 160ms ease-out}
+.bui-drawer{outline:none;height:100%;max-width:100%;animation:bui-drawer-in 240ms var(--ease)}
+.bui-drawer-dialog{height:100%;outline:none}
+.bui-drawer .bui-sidebar{height:100%;width:min(280px,calc(100vw - 32px))}
+@keyframes bui-drawer-in{from{opacity:0;transform:translateX(-24px)}to{opacity:1;transform:translateX(0)}}
+@keyframes bui-overlay-in{from{opacity:0}to{opacity:1}}
+@media(max-width:767px){
+  .bui-desktop-sidebar{display:none}
+  .selea-shell .workspace-sidebar-toggle{display:inline-flex;width:32px;height:32px;color:var(--muted)}
+  .selea-shell .header-brand,.selea-shell.expanded .header-brand{display:inline-flex}
+  .selea-shell .header-brand .brand{font-size:22px;letter-spacing:-.7px}
+  .selea-shell .header-brand .brand svg{width:18px;height:18px}
+  .selea-shell .header-location{display:none}
+  .selea-shell .topbar{padding-inline:12px;gap:10px;height:56px}
+}
+@media(prefers-reduced-motion:reduce){.bui-sidebar *,.bui-sidebar,.bui-drawer,.bui-drawer-overlay{animation:none!important;transition:none!important}}
