@@ -1,55 +1,65 @@
-# Selea Arena
+# Selea
 
-## Current interface
+**Compare AI. See what leads.**
 
-Selea uses a dark shadcn/ui sidebar, a chat studio, and working Leaderboard, Models, Analytics, Projects, Settings, Search, Help, and Account pages. The default route opens New Chat. The original dashboard block source remains on disk; its placeholder business metrics are no longer the default screen.
+Selea is an AI model comparison platform for exploring how different models respond to the same task. Chat with a model, compare two responses side by side, or judge anonymous video outputs and contribute to their rankings.
 
-The sidebar is based on the official shadcn/ui `dashboard-01` block with Tailwind CSS 4. The pre-migration frontend is archived under `artifacts/before-shadcn-dashboard-20261107-203802.zip`.
+Built for people evaluating AI for creative work, research, writing, and development.
 
-## Local setup
+## What you can do
 
-Run the API in one terminal:
+- **Chat and compare** — ask one model or send the same prompt to two models. Add instructions and text references, then vote for the response you prefer.
+- **Explore models** — search the catalog, filter by provider and access, compare specifications, and choose models for your next conversation.
+- **Compare videos** — watch two uploaded outputs with matching playback controls. Model identities are revealed after your vote is saved.
+- **Explore rankings** — see text model results from your workspace and separate video rankings from public votes and Selea team evaluations.
+- **Track your workspace** — revisit conversations, search chat history, review activity and voting statistics, and organize ideas into projects.
+- **Manage video evaluations** — administrators can create challenges, upload externally generated videos, publish comparison pairs, and review results.
+
+## How comparisons work
+
+In text comparisons, both models receive the same prompt. You can choose A, B, a tie, or neither response. Workspace rankings reflect your saved votes.
+
+In Video Arena, each pair belongs to a challenge with a prompt and evaluation criterion. You judge the anonymous outputs before seeing which models produced them. Public and team evaluations have separate rankings. The methodology page explains how scores are calculated.
+
+## Models and credentials
+
+Text chat supports OpenAI, Anthropic, and xAI through LiteLLM. Bring your own provider keys in Settings, or try Demo A and Demo B with simulated responses and no API key.
+
+User-provided provider keys are held in backend memory for the current session. Chats and votes are stored in SQLite. Projects are stored in the current browser. Video files use local media storage.
+
+Video Arena compares videos generated externally and uploaded by administrators.
+
+## Technology
+
+- Next.js, TypeScript, and Tailwind CSS
+- React components with shadcn/ui and BoardUI adaptations
+- Python FastAPI
+- SQLite and local media storage
+- LiteLLM for text model providers
+
+## Run locally
+
+Install backend dependencies and start the API in one terminal.
 
 ```powershell
 cd backend
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
 ```
 
-Run the frontend in another:
+Install frontend dependencies and start the website in another terminal.
 
 ```powershell
 cd frontend
-npm install
-npm run dev -- --hostname 127.0.0.1 --port 3000
+npm ci
+npm run dev -- --hostname localhost --port 3000
 ```
 
-Open http://localhost:3000. Next.js proxies same-origin API requests to FastAPI.
+Open [localhost:3000](http://localhost:3000). Next.js forwards API requests to FastAPI.
 
-## Features
+For video administration, media configuration, publishing workflows, and deployment settings, see [the Video Arena guide](VIDEO_ARENA.md).
 
-- `/` and `/new` open the chat studio. Ask sends to one model; Compare sends to two models and accepts a vote after successful responses.
-- New Chat clears the draft, references, instructions, and model selection. Model cards can also start a chat or a comparison with the chosen models.
-- `/settings` accepts session-only OpenAI, Anthropic, and xAI keys. Development credentials can use OPENAI_API_KEY, ANTHROPIC_API_KEY, and XAI_API_KEY.
-- Demo A and Demo B provide clearly labeled canned responses without paid requests.
-- `/account` supports local email/password registration, sign-in, and sign-out. Guest chats transfer to the account on sign-in or registration.
-- `/history/search` searches saved chat titles. Recents opens the latest eight chats. Chats and votes persist in backend/arena.db.
-- Leaderboard and Analytics show the current workspace's actual activity and votes. `/dashboard` opens the same real analytics, replacing template revenue data.
-- Projects supports local browser notes, editing, search, archiving, and restoring.
-- References accept .txt, .md, .csv, and .json files up to 30 KB; the combined prompt, instructions, and reference must fit within 12,000 characters.
-- `/help` documents controls and limits. Unsupported template Billing and Notifications entries have been removed.
-
-## Limits
-
-This local implementation has no access to Arena's private services or public vote database. Live provider calls require credentials. Agent mode produces HTML prototypes. Image/video generation, browser agents, full-stack deployment, OAuth, email verification/recovery and global crowdsourced rankings are not implemented.
-
-Provider calls are limited to 10 turns per chat and 20 requests per session per minute. A $2 estimated chat budget uses installed LiteLLM pricing plus a 25% reserve. Unknown pricing is blocked. Provider billing can differ from estimates; use provider-side spending limits for a billing guarantee. Request limits and locks are process-local, so run one API worker.
-
-Provider keys are stored only in backend process memory under the current session token hash, expire with that session, and are cleared on sign-in or sign-out. They are never returned to the frontend, persisted in SQLite/browser storage, or saved with chats. Restarting the API clears all keys. Set COOKIE_SECURE=true for HTTPS deployments.
-
-The installed Next.js version reports a security advisory. Update it before public deployment.
-
-## Validation
+## Development checks
 
 ```powershell
 cd backend
@@ -59,14 +69,10 @@ npm run typecheck
 npm run build
 ```
 
-The previous app and its database are backed up in the sibling directory ai-arena-backup-20261106-172954.
+## MVP scope
 
+Selea currently runs as a local workspace. Text model requests require provider credentials, except for the demo models. Text rankings reflect workspace votes. Video rankings reflect evaluations collected by this installation.
 
-For isolated local UI tests, set `ARENA_DATABASE` to a temporary SQLite path and start the API on another port. Set frontend `SELEA_API_URL` to that API URL and `SELEA_DIST_DIR` to a separate build directory before starting Next on another port. These environment overrides are server-only.
+Provider requests have session rate limits, a maximum of 10 turns per chat, and a $2 estimated chat budget. Provider billing may differ from estimates. Run one API worker because request limits and locks are process-local.
 
-
-## Manual video comparisons
-
-The existing design now supports video comparison workflows. Start from **New Chat → Compare videos**. Video rankings are under **Leaderboard**, published video models under **Models → Video**, challenges under **Projects → Video challenges**, and administration under **Settings → Administration**.
-
-See [VIDEO_ARENA.md](VIDEO_ARENA.md) for exact Windows/macOS/Linux setup, the one-time `python -m app.admin_setup` command, publishing steps, SQLite migration, persistent media configuration, and verification limitations. No generation-provider keys are required for manual uploads. The new routes use the same sidebar, typography, header, neutral colors, and responsive frame as the existing workspace.
+For deployment, configure HTTPS cookies and persistent database and media paths using the Video Arena guide.
