@@ -4,10 +4,12 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import { ensureWorkspaceSession } from "@/lib/workspace-api"
 import { usePathname } from "next/navigation"
-import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar"
+import { IconSearch } from "@tabler/icons-react"
+import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuItem, SidebarMenuButton, useSidebar } from "@/components/ui/sidebar"
 
 export function NavDocuments() {
   const pathname = usePathname()
+  const { setOpenMobile } = useSidebar()
   const [chats, setChats] = useState<{ id: string; title: string }[]>([])
   useEffect(() => {
     let active = true
@@ -28,9 +30,14 @@ export function NavDocuments() {
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <SidebarGroupLabel>Recents</SidebarGroupLabel>
       <SidebarMenu>
+        <SidebarMenuItem>
+          <SidebarMenuButton asChild isActive={pathname === "/history/search"}>
+            <Link href="/history/search" onClick={() => setOpenMobile(false)}><IconSearch /><span>Search chats</span></Link>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
         {chats.map(chat => <SidebarMenuItem key={chat.id}>
           <SidebarMenuButton asChild isActive={pathname === `/chat/${chat.id}`}>
-            <Link href={`/chat/${chat.id}`} title={chat.title}><span className="truncate">{chat.title}</span></Link>
+            <Link href={`/chat/${chat.id}`} title={chat.title} onClick={() => setOpenMobile(false)}><span className="truncate">{chat.title}</span></Link>
           </SidebarMenuButton>
         </SidebarMenuItem>)}
       </SidebarMenu>

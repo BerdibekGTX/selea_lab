@@ -9,8 +9,8 @@ import {
   IconHelp,
   IconInnerShadowTop,
   IconListDetails,
-  IconSearch,
   IconSettings,
+  IconVideo,
 } from "@tabler/icons-react"
 
 import { NavDocuments } from "@/components/nav-documents"
@@ -25,10 +25,16 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar"
 
 const data = {
   navMain: [
+    {
+      title: "Video Arena",
+      url: "/arena",
+      icon: IconVideo,
+    },
     {
       title: "Leaderboard",
       url: "/leaderboard",
@@ -39,6 +45,8 @@ const data = {
       url: "/models",
       icon: IconListDetails,
     },
+  ],
+  workspace: [
     {
       title: "Analytics",
       url: "/analytics",
@@ -57,20 +65,16 @@ const data = {
       icon: IconSettings,
     },
     {
-      title: "Get Help",
+      title: "Help",
       url: "/help",
       icon: IconHelp,
-    },
-    {
-      title: "Search",
-      url: "/history/search",
-      icon: IconSearch,
     },
   ],
 
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { setOpenMobile } = useSidebar()
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
@@ -80,7 +84,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               asChild
               className="data-[slot=sidebar-menu-button]:p-1.5!"
             >
-              <Link href="/new">
+              <Link href="/new" onClick={() => setOpenMobile(false)}>
                 <IconInnerShadowTop className="size-5!" />
                 <span className="text-base font-semibold">Selea</span>
               </Link>
@@ -91,9 +95,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         <NavMain items={data.navMain} />
         <NavDocuments />
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
+        <NavSecondary items={data.workspace} label="Workspace" />
       </SidebarContent>
       <SidebarFooter>
+        <NavSecondary items={data.navSecondary} className="p-0" />
         <NavUser />
       </SidebarFooter>
     </Sidebar>

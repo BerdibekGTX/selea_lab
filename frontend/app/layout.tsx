@@ -4,6 +4,7 @@ import "./globals.css";
 import "./leaderboard.css";
 import "./models.css";
 import "./catalog-workspace.css";
+import "./workspace-controls.css";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import { WorkspaceProvider } from "@/components/workspace-context";

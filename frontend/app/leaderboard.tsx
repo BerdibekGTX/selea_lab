@@ -5,6 +5,7 @@
 import {useEffect, useRef, useState} from "react";
 
 import Link from "next/link";
+import { ModelRankingChart } from "@/components/model-ranking-chart";
 
 
 
@@ -217,9 +218,7 @@ export default function Leaderboard({category,ready,onStart}: {category:string;r
 
   const rankings=data?.rankings??[];
 
-  const top=rankings.slice(0,10);
-
-  const max=top.length?Math.max(...top.map(rate),1):1;
+  const top = rankings.filter(score => score.votes > 0).slice(0, 10);
 
   const badge=category==="overview"?"Best Overall":selected.label;
 
@@ -261,13 +260,9 @@ export default function Leaderboard({category,ready,onStart}: {category:string;r
 
           <div className="lb-chart" aria-label="Model win rates">
 
-            {top.map((score,index)=><div className="lb-bar-row" key={score.provider+score.id}>
-
-              <div className="lb-bar-fill" style={{width:Math.max(8,rate(score)/max*100)+"%",opacity:1-index*.055}}/>
-
-              <div className="lb-bar-label"><span className="lb-rank">{index+1}</span><ModelMark provider={score.provider}/><span className="lb-model-name" title={score.id}>{score.id}</span>{score.provider==="demo"&&<span className="lb-demo-tag">Demo</span>}<strong>{rate(score).toFixed(1)}%</strong></div>
-
-            </div>)}
+            {top.length > 0 && <ModelRankingChart rows={top.map(score => ({
+              id: score.provider + "/" + score.id, model: score.id, winRate: rate(score), votes: score.votes,
+            }))}/>}
 
             {data&&!top.length&&<div className="lb-panel-empty"><ChartBar size={32}/><h3>No ranked models yet</h3><p>{data.supported?"Completed comparisons and votes will populate this chart.":"This category will appear here when evaluations become available."}</p>{data.supported&&<button className="secondary" onClick={onStart}>Compare models <ArrowRight size={14}/></button>}</div>}
 

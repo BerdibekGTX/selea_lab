@@ -3,12 +3,18 @@
 import {useEffect, useMemo, useRef, useState} from "react";
 import {Pagination} from "../components/boardui/pagination";
 import {PageHeading} from "../components/boardui/page-heading";
-import {ArrowRight, CaretDown, MagnifyingGlass, SlidersHorizontal, Scales, X, Cube, ArrowUpRight} from "@phosphor-icons/react";
+import {ArrowRight, CaretDown, MagnifyingGlass, Scales, X, Cube, ArrowUpRight} from "@phosphor-icons/react";
+
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuCheckboxItem,
+} from "@/components/ui/dropdown-menu";
 
 type Model = {id:string;provider:string};
 type CatalogModel = Model & {name:string;context:number|null;output:number|null;input_cost:number|null;output_cost:number|null};
 type Score = Model & {wins:number;ties:number;votes:number};
 const providers:Record<string,string>={demo:"Selea",openai:"OpenAI",anthropic:"Anthropic",xai:"xAI"};
+const accessLabels = { demo: "Free demo", api: "Your API key" };
 const keyOf=(model:Model)=>model.provider+"/"+model.id;
 const tokens=(value:number|null)=>value===null?"—":Intl.NumberFormat("en",{notation:"compact",maximumFractionDigits:1}).format(value);
 const price=(value:number|null)=>value===null?"—":value===0?"Free":"$"+Intl.NumberFormat("en",{maximumFractionDigits:2}).format(value*1_000_000);
@@ -23,13 +29,10 @@ export default function Models({configured,ready,onUse,onConfigure}:{configured:
   const [query,setQuery]=useState("");
   const [providerFilter,setProviderFilter]=useState<string[]>([]);
   const [access,setAccess]=useState<string[]>([]);
-  const [arenaFilter,setArenaFilter]=useState<string[]>([]);
-  const [textOnly,setTextOnly]=useState(false);
   const [sort,setSort]=useState("name");
   const [pageSize,setPageSize]=useState(12);
   const [page,setPage]=useState(1);
   const [selected,setSelected]=useState<string[]>([]);
-  const [mobileFilters,setMobileFilters]=useState(false);
   const compare=useRef<HTMLDialogElement>(null);
   useEffect(()=>{
     const controller=new AbortController();
@@ -64,29 +67,43 @@ export default function Models({configured,ready,onUse,onConfigure}:{configured:
   const current=Math.min(page,pages);
   const shown=filtered.slice((current-1)*pageSize,current*pageSize);
   const selectedModels=models.filter(model=>selected.includes(keyOf(model)));
-  const filterCount=providerFilter.length+access.length+arenaFilter.length+Number(textOnly);
-  function reset(){setProviderFilter([]);setAccess([]);setArenaFilter([]);setTextOnly(false);setQuery("");setPage(1)}
+  function reset(){setProviderFilter([]);setAccess([]);setQuery("");setPage(1)}
   function toggle(value:string,values:string[],setter:(values:string[])=>void){setter(values.includes(value)?values.filter(item=>item!==value):[...values,value]);setPage(1)}
   function choose(model:CatalogModel){const key=keyOf(model);setSelected(previous=>previous.includes(key)?previous.filter(id=>id!==key):previous.length<3?[...previous,key]:previous)}
   function openCompare(){compare.current?.showModal()}
   return <section className="models-page">
     <PageHeading className="models-heading" title="Models" description="Find the right model. Compare capabilities, cost, and your results." icon={<Cube size={22}/>}/>
-    <div className="models-search-row">
-      <label className="models-search"><MagnifyingGlass size={20}/><input aria-label="Search models" placeholder="Search by model, provider, or capability…" value={query} onChange={e=>{setQuery(e.target.value);setPage(1)}}/>{query&&<button aria-label="Clear search" onClick={()=>{setQuery("");setPage(1)}}><X size={16}/></button>}</label>
-      <button className="models-compare" onClick={openCompare}><Scales size={19}/>Compare Models{selected.length>0&&<span>{selected.length}</span>}</button>
-    </div>
-    <div className="models-quick" aria-label="Quick model filters"><span>EXPLORE</span>{["OpenAI","Anthropic","xAI","Demo"].map(label=><button key={label} onClick={()=>{reset();setQuery(label)}}>{label}<ArrowUpRight size={12}/><small>{label==="Demo"?"No key needed":"Text & code"}</small></button>)}</div>
-    <div className="models-layout">
-      <aside className={"models-filters "+(mobileFilters?"is-open":"")}>
-        <div className="models-filter-title"><h2>Filters</h2>{filterCount>0&&<button onClick={reset}>Reset</button>}<button className="models-filter-close icon" aria-label="Close filters" onClick={()=>setMobileFilters(false)}><X size={18}/></button></div>
-        <details open><summary>Input-to-Output<CaretDown size={13}/></summary><label><input type="checkbox" checked={textOnly} onChange={e=>{setTextOnly(e.target.checked);setPage(1)}}/>Text to Text<span>{models.length}</span></label><p>Text input and output are supported in this workspace.</p></details>
-        <details open><summary>Arenas<CaretDown size={13}/></summary>{["Chat","Code"].map(arena=><label key={arena}><input type="checkbox" checked={arenaFilter.includes(arena)} onChange={()=>toggle(arena,arenaFilter,setArenaFilter)}/>{arena}<span>{models.length}</span></label>)}<p>All listed models can be used in Chat and Code.</p></details>
-        <details open><summary>Providers<CaretDown size={13}/></summary>{Object.entries(providers).map(([id,label])=><label key={id}><input type="checkbox" checked={providerFilter.includes(id)} onChange={()=>toggle(id,providerFilter,setProviderFilter)}/>{label}<span>{models.filter(model=>model.provider===id).length}</span></label>)}</details>
-        <details open><summary>Access<CaretDown size={13}/></summary>{[["demo","Free demo"],["api","Your API key"]].map(([id,label])=><label key={id}><input type="checkbox" checked={access.includes(id)} onChange={()=>toggle(id,access,setAccess)}/>{label}</label>)}</details>
-        <button className="models-configure" onClick={onConfigure}>Connect your models<ArrowUpRight size={14}/></button>
-      </aside>
-      <div className="models-results">
-        <div className="models-toolbar"><button className="models-filter-toggle" onClick={()=>setMobileFilters(!mobileFilters)}><SlidersHorizontal size={17}/>Filters{filterCount?` (${filterCount})`:""}</button><p aria-live="polite">{loading?"Loading models…":`Showing ${filtered.length?(current-1)*pageSize+1:0}–${Math.min(current*pageSize,filtered.length)} of ${filtered.length}`}</p><label>Sort: <select aria-label="Sort models" value={sort} onChange={e=>{setSort(e.target.value);setPage(1)}}><option value="name">Name</option><option value="provider">Provider</option><option value="context">Context window</option><option value="cost">Lowest input cost</option></select></label><label>Per page: <select aria-label="Results per page" value={pageSize} onChange={e=>{setPageSize(Number(e.target.value));setPage(1)}}>{[6,12,24].map(size=><option key={size}>{size}</option>)}</select></label></div>
+    <section className="models-filter-bar" aria-label="Catalog filters">
+      <div className="models-search-row">
+        <div className="models-search">
+          <MagnifyingGlass size={20} aria-hidden="true"/>
+          <input type="search" aria-label="Search models" placeholder="Search by model, provider, or capability…"
+            value={query} onChange={e=>{setQuery(e.target.value);setPage(1)}}/>
+          {query && <button aria-label="Clear search" onClick={()=>{setQuery("");setPage(1)}}><X size={16}/></button>}
+        </div>
+        <button className="models-compare" onClick={openCompare}><Scales size={19}/>Compare Models{selected.length>0&&<span>{selected.length}</span>}</button>
+      </div>
+      <div className="models-filter-options">
+        <ModelFilter label="Provider" options={providers} values={providerFilter}
+          onToggle={id => toggle(id, providerFilter, setProviderFilter)}/>
+        <ModelFilter label="Access" options={accessLabels} values={access}
+          onToggle={id => toggle(id, access, setAccess)}/>
+        <div className="models-filter-chips" aria-label="Active filters">
+          {providerFilter.map(id => <button type="button" key={id} aria-label={`Remove ${providers[id]} filter`}
+            onClick={() => toggle(id, providerFilter, setProviderFilter)}>{providers[id]}<X size={12}/></button>)}
+          {access.map(id => {
+            const label = accessLabels[id as keyof typeof accessLabels];
+            return <button type="button" key={id} aria-label={`Remove ${label} filter`}
+              onClick={() => toggle(id, access, setAccess)}>{label}<X size={12}/></button>;
+          })}
+        </div>
+        {(query || providerFilter.length > 0 || access.length > 0) &&
+          <Button variant="ghost" size="sm" onClick={reset}>Clear all</Button>}
+        <Button className="models-connect" variant="ghost" size="sm" onClick={onConfigure}>Connect models<ArrowUpRight size={14}/></Button>
+      </div>
+    </section>
+    <div className="models-results">
+        <div className="models-toolbar"><p aria-live="polite">{loading?"Loading models…":`Showing ${filtered.length?(current-1)*pageSize+1:0}–${Math.min(current*pageSize,filtered.length)} of ${filtered.length}`}</p><label>Sort: <select aria-label="Sort models" value={sort} onChange={e=>{setSort(e.target.value);setPage(1)}}><option value="name">Name</option><option value="provider">Provider</option><option value="context">Context window</option><option value="cost">Lowest input cost</option></select></label><label>Per page: <select aria-label="Results per page" value={pageSize} onChange={e=>{setPageSize(Number(e.target.value));setPage(1)}}>{[6,12,24].map(size=><option key={size}>{size}</option>)}</select></label></div>
         {selected.length>0&&<div className="models-selection"><span>{selected.length} of 3 selected</span><button onClick={()=>setSelected([])}>Clear</button><button onClick={openCompare}>Compare selection<ArrowRight size={14}/></button></div>}
         {error?<div className="models-empty" role="alert"><p>{error}</p><button className="secondary" onClick={()=>setRetry(value=>value+1)}>Try again</button></div>:loading?<div className="models-grid" aria-hidden="true">{[0,1,2,3].map(i=><div className="model-skeleton" key={i}/>)}</div>:<div className="models-grid">
           {shown.map(model=>{const score=scores.find(score=>keyOf(score)===keyOf(model));const chosen=selected.includes(keyOf(model));return <article className={"catalog-card "+(chosen?"is-selected":"")} key={keyOf(model)}>
@@ -99,7 +116,6 @@ export default function Models({configured,ready,onUse,onConfigure}:{configured:
         {!loading&&!error&&!shown.length&&<div className="models-empty"><MagnifyingGlass size={30}/><h2>No models found</h2><p>Try a different search or clear your filters.</p><button className="secondary" onClick={reset}>Clear filters</button></div>}
         {!loading&&!error&&pages>1&&<Pagination page={current} totalPages={pages} onChange={setPage}/>}
         <p className="models-disclaimer">Prices and token limits come from the installed LiteLLM catalog and may change. Availability depends on your provider account. Win rates reflect only your votes; unranked models show —.</p>
-      </div>
     </div>
     <dialog ref={compare} className="models-comparison" onClick={e=>{if(e.target===e.currentTarget)compare.current?.close()}}><div className="dialog-content"><header><h2>Compare models</h2><button className="icon" aria-label="Close model comparison" onClick={()=>compare.current?.close()}><X size={20}/></button></header>
       {selectedModels.length<2?<div className="models-empty"><Scales size={32}/><h3>Select two or three models</h3><p>Use the Compare checkbox on each model card to see them side by side.</p><button className="primary" onClick={()=>compare.current?.close()}>Choose models</button></div>:<><div className="models-comparison-scroll"><table><thead><tr><th>Model</th>{selectedModels.map(model=><th key={keyOf(model)}>{model.name}</th>)}</tr></thead><tbody>{[
@@ -113,4 +129,27 @@ export default function Models({configured,ready,onUse,onConfigure}:{configured:
       ].map(([label,...values])=><tr key={label}><th scope="row">{label}</th>{values.map((value,index)=><td key={index}>{value}</td>)}</tr>)}</tbody></table></div><p>{selectedModels.length===2?"Start a side-by-side chat with these two models. Provider models require your API keys in Settings.":"Compare up to three specifications here. Select exactly two models to start a side-by-side chat."}</p><button className="primary" disabled={selectedModels.length!==2} onClick={()=>{compare.current?.close();onUse(selectedModels)}}>Start comparison<ArrowRight size={16}/></button></>}
     </div></dialog>
   </section>;
+}
+
+function ModelFilter({ label, options, values, onToggle }: {
+  label: string;
+  options: Record<string, string>;
+  values: string[];
+  onToggle: (id: string) => void;
+}) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" size="sm">{label}<CaretDown size={13}/></Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start">
+        {Object.entries(options).map(([id, name]) => (
+          <DropdownMenuCheckboxItem key={id} checked={values.includes(id)}
+            onSelect={event => event.preventDefault()} onCheckedChange={() => onToggle(id)}>
+            {name}
+          </DropdownMenuCheckboxItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 }

@@ -12,6 +12,8 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import Leaderboard, { LeaderboardHeader } from "@/app/leaderboard"
 
 import Models from "@/app/models"
+import { VideoModelCatalog } from "@/components/video-model-catalog"
+import Link from "next/link"
 
 import { useWorkspace } from "@/components/workspace-context"
 import { ensureWorkspaceSession } from "@/lib/workspace-api"
@@ -21,6 +23,7 @@ import { ensureWorkspaceSession } from "@/lib/workspace-api"
 export function CatalogWorkspace({view}: {view:"models"|"leaderboard"}) {
 
   const workspace = useWorkspace()
+  const [modelKind,setModelKind]=useState("text")
   const path=usePathname()
 
   const router=useRouter()
@@ -57,7 +60,7 @@ export function CatalogWorkspace({view}: {view:"models"|"leaderboard"}) {
 
         {error&&<div role="alert" className="catalog-api-error">The workspace API is unavailable. <button onClick={()=>setRetry(n=>n+1)}>Retry</button></div>}
 
-        {view==="models"?<Models configured={workspace.catalog.filter(m=>workspace.configured.includes(m.provider))} ready={ready} onConfigure={()=>router.push("/settings")} onUse={models=>workspace.startChat(models)}/>:<Leaderboard category={category} ready={ready} onStart={()=>workspace.startChat([{provider:"demo",id:"demo-a"},{provider:"demo",id:"demo-b"}])}/>}
+        {view==="models"?<><div className="catalog-kind-switch" role="group" aria-label="Model type"><button aria-pressed={modelKind==="text"} onClick={()=>setModelKind("text")}>Text & code</button><button aria-pressed={modelKind==="video"} onClick={()=>setModelKind("video")}>Video</button></div>{modelKind==="video"?<VideoModelCatalog/>:<Models configured={workspace.catalog.filter(m=>workspace.configured.includes(m.provider))} ready={ready} onConfigure={()=>router.push("/settings")} onUse={models=>workspace.startChat(models)}/>}</>:<><div className="catalog-kind-switch"><span>Text comparisons</span><Link href="/leaderboard/text-to-video">Video rankings →</Link></div><Leaderboard category={category} ready={ready} onStart={()=>workspace.startChat([{provider:"demo",id:"demo-a"},{provider:"demo",id:"demo-b"}])}/></>}
 
       </div>
 

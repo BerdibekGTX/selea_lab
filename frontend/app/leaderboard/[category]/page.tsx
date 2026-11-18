@@ -1,2 +1,6 @@
 import { CatalogWorkspace } from "@/components/catalog-workspace"
-export default function Page(){return <CatalogWorkspace view="leaderboard"/>}
+import VideoLeaderboard from "@/app/video-leaderboard/page"
+export default async function Page({params}:{params:Promise<{category:string}>}) {
+ const {category}=await params
+ return category==="text-to-video"||category==="image-to-video" ? <VideoLeaderboard initialCategory={category}/> : <CatalogWorkspace view="leaderboard"/>
+}

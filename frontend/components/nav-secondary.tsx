@@ -8,6 +8,7 @@ import { type Icon } from "@tabler/icons-react"
 import {
   SidebarGroup,
   SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -16,6 +17,7 @@ import {
 
 export function NavSecondary({
   items,
+  label,
   ...props
 }: {
   items: {
@@ -23,11 +25,13 @@ export function NavSecondary({
     url: string
     icon: Icon
   }[]
+  label?: string
 } & React.ComponentPropsWithoutRef<typeof SidebarGroup>) {
   const path = usePathname()
   const { setOpenMobile } = useSidebar()
   return (
     <SidebarGroup {...props}>
+      {label && <SidebarGroupLabel>{label}</SidebarGroupLabel>}
       <SidebarGroupContent>
         <SidebarMenu>
           {items.map((item) => (

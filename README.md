@@ -63,3 +63,10 @@ The previous app and its database are backed up in the sibling directory ai-aren
 
 
 For isolated local UI tests, set `ARENA_DATABASE` to a temporary SQLite path and start the API on another port. Set frontend `SELEA_API_URL` to that API URL and `SELEA_DIST_DIR` to a separate build directory before starting Next on another port. These environment overrides are server-only.
+
+
+## Manual video comparisons
+
+The existing design now supports video comparison workflows. Start from **New Chat → Compare videos**. Video rankings are under **Leaderboard**, published video models under **Models → Video**, challenges under **Projects → Video challenges**, and administration under **Settings → Administration**.
+
+See [VIDEO_ARENA.md](VIDEO_ARENA.md) for exact Windows/macOS/Linux setup, the one-time `python -m app.admin_setup` command, publishing steps, SQLite migration, persistent media configuration, and verification limitations. No generation-provider keys are required for manual uploads. The new routes use the same sidebar, typography, header, neutral colors, and responsive frame as the existing workspace.

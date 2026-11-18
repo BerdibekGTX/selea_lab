@@ -35,3 +35,9 @@
 @media(min-width:701px){.catalog-workspace .models-filter-close.icon{display:none}}
 
 .catalog-workspace .bui-pagination ul{display:flex;gap:6px}.catalog-workspace .bui-pagination button{display:flex;align-items:center;gap:6px}
+
+.catalog-kind-switch{display:flex;gap:8px;align-items:center;padding:16px 32px;font-size:12px;color:var(--muted-foreground)}
+.catalog-kind-switch button,.catalog-kind-switch a{padding:8px 12px;border:1px solid var(--border);border-radius:8px}
+.catalog-kind-switch button[aria-pressed=true]{background:var(--secondary);color:var(--foreground)}
+.video-catalog-search{width:100%;border:1px solid var(--border);border-radius:8px;padding:12px 16px;background:var(--card);margin-bottom:24px;font-size:13px}.video-catalog-description{padding:20px 0;color:var(--muted-foreground);font-size:13px}
+@media(max-width:700px){.catalog-kind-switch{padding:16px}}

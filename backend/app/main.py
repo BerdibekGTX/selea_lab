@@ -35,6 +35,7 @@ def credentials_for(request):
 def db():
     connection = sqlite3.connect(DB, timeout=15)
     connection.row_factory = sqlite3.Row
+    connection.execute("PRAGMA foreign_keys=ON")
     return connection
 
 
@@ -422,3 +423,7 @@ def leaderboard_overview(request: Request, category: str = "overview"):
         "rankings": rank_chats(selected),
         "recent": recent,
     }
+
+
+from .video import router as video_router
+app.include_router(video_router)
